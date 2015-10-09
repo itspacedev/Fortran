@@ -12,7 +12,6 @@ program program_2_3
         read (In, '(f4.3)') X
     close (In)
     
-    !allocate (Pos(N), source=.false.)
     Pos = X > 0
     C = Count(Pos)
     
