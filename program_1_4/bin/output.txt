@@ -1,0 +1,7 @@
+a     = 4.00
+
+item  = .50
+item  = .04
+item  = .01
+ln    = 1.79
+Error = .00
