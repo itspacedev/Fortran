@@ -9,7 +9,7 @@ program program_2_3
     open (file=input_file, encoding=E_, newunit=In)
         read (In, *) N
         allocate  (X(N))
-        read (In, '(f4.3)') X
+        read (In, *) X
     close (In)
     
     Pos = X > 0
