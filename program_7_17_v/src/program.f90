@@ -2,10 +2,12 @@ program program_6_1_v
     implicit none
     integer, parameter      :: R_ = 8
     character(*), parameter :: input_file = "../data/input.txt", output_file = "output.txt", E_ = "UTF-8"
-    !character(:), allocatable :: form
-    integer                 :: In = 0, Out = 0, N = 0, i = 0, Max = 0, MaxE = 0, MinE = 0
-    integer, allocatable    :: X(:, :)
-    
+    integer                 :: In = 0, Out = 0, N = 0, i = 0, j = 0!, Max = 0, MaxE = 0, MinE = 0
+    integer                 :: max_val = 0, max_neg = 0, max_pos = 0, N_max = 0
+    integer, allocatable    :: X(:, :), Ind(:, :), Ind_max(:, :)
+    character(10)           :: format
+    logical, allocatable    :: Mask_max(:, :)
+
     open (file=input_file, encoding=E_, newunit=In)
         read (In, *) N
         allocate(X(N, N)) 
@@ -13,28 +15,39 @@ program program_6_1_v
     close (In)
     
     open (file=output_file, encoding=E_, newunit=Out)    
-        write (Out, '(a, T4, "= ", i0)') "N", N
-        write (Out, '(5(i4, " "))') (X(i, :), i = 1, N)
+        !write (Out, '(a, T4, "= ", i0)') "N", N
+    
+        write (format, '(a, i0, a)') "(", N, "i3)"
+        write (Out, format) (X(i, :), i = 1, N)
         
-        
-        MinE = Abs(MinVal(X))
-        MaxE = Abs(MaxVal(X))
-        if (MinE > MaxE) then
-            Max = MinE
-        else
-            Max = MaxE
-        end if
+        max_neg = Abs(MinVal(X, X < 0))
+        max_pos = Abs(MaxVal(X, X > 0))
 
-        !do i = 1, N
-        !    do j = 1, N
-        !        if (Abs(X(i, j)) > Max) then
-        !            Max = Abs( X(i, j) )
-        !        end if
-        !    end do
-        !end do
+        max_val = max_neg
+        if (max_pos > max_val) then
+            max_val = max_pos
+        endif
+
+        if (max_val > 0) then
+            max_val = - max_val
+        endif
+        
+        !write (Out, *) "max_val = ", max_val
+    
+        allocate ( Ind(N*N, 2) )
+        Ind(:, 1) = [((i, i = 1, N), j = 1, N)]
+        Ind(:, 2) = [((j, i = 1, N), j = 1, N)]
+
+
+        Mask_max = ( X == max_val .OR. X == Abs(max_val) )
+        N_max = Count(Mask_max)
+
+        Ind_max = Reshape( Pack(Ind, Spread( Reshape(Mask_max, [N*N]), 2, 2)), [N_max, 2] )
         
         write (Out, *)
-        write (Out, '(a, T7, "= ", i0)') "Max", Max
+        write (Out, *) "Abs(max_val) = ", Abs(max_val)
+        write (Out, '(2i2)') (Ind_max(i, :), i = 1, N_max) 
+
     close (Out)
         
 end program program_6_1_v
