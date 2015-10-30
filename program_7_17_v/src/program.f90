@@ -20,26 +20,14 @@ program program_6_1_v
         write (format, '(a, i0, a)') "(", N, "i3)"
         write (Out, format) (X(i, :), i = 1, N)
         
-        max_neg = Abs(MinVal(X, X < 0))
-        max_pos = Abs(MaxVal(X, X > 0))
-
-        max_val = max_neg
-        if (max_pos > max_val) then
-            max_val = max_pos
-        endif
-
-        if (max_val > 0) then
-            max_val = - max_val
-        endif
-        
-        !write (Out, *) "max_val = ", max_val
+        max_val = MaxVal((Abs(X))
     
         allocate ( Ind(N*N, 2) )
         Ind(:, 1) = [((i, i = 1, N), j = 1, N)]
         Ind(:, 2) = [((j, i = 1, N), j = 1, N)]
 
 
-        Mask_max = ( X == max_val .OR. X == Abs(max_val) )
+        Mask_max = (Abs(X) == max_val )
         N_max = Count(Mask_max)
 
         Ind_max = Reshape( Pack(Ind, Spread( Reshape(Mask_max, [N*N]), 2, 2)), [N_max, 2] )

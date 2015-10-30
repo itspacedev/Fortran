@@ -2,32 +2,40 @@ program program_6_1_v
     implicit none
     integer, parameter      :: R_ = 8
     character(*), parameter :: input_file = "../data/input.txt", output_file = "output.txt", E_ = "UTF-8"
-    character(:), allocatable :: form
-    integer                 :: In = 0, Out = 0, N = 0, i = 0, MinInd = 0, tmp
-    integer, allocatable    :: X(:)
+    !character(:), allocatable :: form
+    integer                 :: In = 0, Out = 0, N = 0, i = 0, C = 0
+    integer, allocatable    :: A(:, :), X(:), Y(:)!, C(:)
+    character(10)           :: format
     
     open (file=input_file, encoding=E_, newunit=In)
         read (In, *) N
-        allocate( X(N) ) 
+        allocate(A(N, N)) 
+        read (In, *) (A(i, :), i = 1, N)
+        
+        allocate(X(N))
         read (In, *) X
+
+        allocate(Y(N))
+        read (In, *) Y
     close (In)
     
     open (file=output_file, encoding=E_, newunit=Out)    
-        write (Out, '(a, T4, "= ", i0)') "N", N 
-        form =  '(7(i0, " "))'
-        write (Out, form) X
-        do i=1, N-1
-            !write (Out, "(i0)") X(i)
-            MinInd = MinLoc(X(i:N), 1) + i-1
-            if (i /= MinInd) then
-                tmp = X(i)
-                X(i) = X(MinInd)
-                X(MinInd) = tmp
-            end if
+        write (format, '(a, i0, a)') "(", N, "i0)"
+        write (Out, format) (A(i, :), i = 1, N)
         
-        end do     
-    
-        write (Out, form) X
+        C = Dot_product(X, Matmul(A, Y))
+        
+        write (Out, *)
+        write (Out, '(a, T4, "= ", i0)') "C", C
+        !C = []
+        !write (Out, *)
+        !write (Out, format) A
+        !write (Out, format) B
+
+        !C = [ Dot_product(X, Matmul(A, B))]
+        
+        !write (Out, *)
+        !write (Out, *) C
     close (Out)
         
 end program program_6_1_v
