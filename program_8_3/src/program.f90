@@ -29,11 +29,10 @@ contains
         integer                 :: i, N, tmp
 
         N = Ubound(A, 1)
-        allocate(B(N, N))
         
         B = A
 
-        do i = 1, N
+        do concurrent (i = 1:N)
             tmp = B(i, i)
             B(i, i) = B(i, N - i + 1)
             B(i, N - i + 1) = tmp
