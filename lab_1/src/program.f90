@@ -19,7 +19,7 @@ program lab_1
     integer                           :: Years(STUD_AMOUNT) = 0
     integer :: In, Out, IO, i, Boys_Amount = 0, Boys_Avg = 0
     integer :: CYEAR = 2015
-    
+    integer, parameter :: INT_C = 5 
     character(:), allocatable :: postfix
     !character(10, kind=CH_) :: postfix
 
@@ -61,7 +61,7 @@ program lab_1
 
     open (file=output_file, encoding=E_, newunit=Out, position='append')
         write(Out, *) (Postfix_Arr(i), i =1,Size(Postfix_Arr))
-        
+        write(Out, *) 'lol' // INT_C        
         write(Out, '(/a)') "Список юношей:"
         format2 = '(3(a, 1x), i4, 1x,  i0, " лет")'
 

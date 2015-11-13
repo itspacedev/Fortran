@@ -10,10 +10,11 @@ module Environment
 
     interface operator (//)
         module procedure Int_plus_string
-        module procedure string_plus_int
+        module procedure String_plus_int
     end interface
 
 contains
+
     pure function Int_plus_string(int, str) result(res)
         integer, intent(in)         :: int
         character(*), intent(in)    :: str
@@ -22,12 +23,11 @@ contains
         write (res, '(i0, a)') int, str
    end function Int_plus_string
 
-   pure function string_plus_int(strVal, intVal) result(res)
-        integer, intent(in)         :: intVal
-        character(*), intent(in)    :: strVal
-        character(Len(strVal) + Max(Floor(Log10(Real(intVal, real64))) + 1, 1))   :: res
-
-        write (res, '(a, i0)') strVal, intVal
-   end function string_plus_int
+   pure function String_plus_int(str, int) result(res)
+        integer, intent(in)         :: int
+        character(*), intent(in)    :: str
+        character(Len(str) + Max(Floor(Log10(Real(int, I_*2))) + 1, 1))   :: res
+        write (res, '(a, i0)') str, int
+   end function String_plus_int
 
 end module Environment
