@@ -1,78 +1,65 @@
-program lab_1
-    use Environment
-    
+program lab_1_2
+    use environment
+
     implicit none
 
-    integer, parameter              :: STUD_AMOUNT = 6, SURNAMES_LEN = 15, INITIALS_LEN = 5, YEARS_LEN = 4
-    character(kind=CH_), parameter  :: MALE = Char(Int(z'041C'), CH_)
-    character(:), allocatable       :: input_file, output_file, format, format2
-    
-    character(SURNAMES_LEN, kind=CH_) :: Surnames(STUD_AMOUNT) = CH__""
-    character(INITIALS_LEN, kind=CH_) :: Initials(STUD_AMOUNT) = CH__""
+    integer, parameter                  ::  STUD_AMOUNT = 8, SURNAMES_LEN = 15, INITIALS_LEN = 5
+    !character(kind=CH_)                 ::  MALE = Char(Int(z'041C'), CH_)
+    character(:), allocatable           ::  input_file, output_file
 
-    character(SURNAMES_LEN, kind=CH_), allocatable :: Boys_Surnames(:)
-    character(INITIALS_LEN, kind=CH_), allocatable ::  Boys_Initials(:)
-    integer, allocatable              :: Boys_Years(:), Boys_Age(:)
-    
-    character(kind=CH_)               :: Gender(STUD_AMOUNT) = CH__""!, postfix_end_char = CH__""
-    logical, allocatable              :: Is_A_Boy(:)
-    integer                           :: Years(STUD_AMOUNT) = 0
-    integer :: In, Out, IO, i, Boys_Amount = 0, Boys_Avg = 0
-    integer :: CYEAR = 2015
-    !integer, parameter :: INT_C = 5 
-    character(:), allocatable :: postfix
-    !character(10, kind=CH_) :: postfix
+    character(kind=CH_)                 ::  Surnames(STUD_AMOUNT, SURNAMES_LEN) = "", &
+                                            Initials(STUD_AMOUNT, INITIALS_LEN) = "", &
+                                            Genders(STUD_AMOUNT) = ""
+
+    !character(kind=CH_), allocatable    :: Boys_Surnames(:, :), Boys_Initials(:, :)
+    integer                  :: Years(STUD_AMOUNT)
 
     input_file  = "../data/input.txt"
     output_file = "output.txt"
     
-    open (file=input_file, encoding=E_, newunit=In)
-        format = '(3(a, 1x), i4)'
-        read (In, format, iostat=IO) (Surnames(i), Initials(i), Gender(i), Years(i), i = 1, STUD_AMOUNT)
-    close (In)
-
-    Out = OUTPUT_UNIT
-    open (Out, encoding=E_)
-        select case (io)
-            case(0)
-            case(IOSTAT_END)
-                write (Out, *) "End of file has been reached while reading class"
-            case(1:)
-                write (Out, *) "Error while reading class list: ", io
-            case default
-                write (Out, *) "Unknown error: ", io
-        end select
-
-    open (file=output_file, encoding=E_, newunit=Out)
-        write (Out, '(a)') "Исходный список:"
-        write (Out, format, iostat=IO) (Surnames(i), Initials(i), Gender(i), Years(i), i = 1, STUD_AMOUNT)
-    close (Out)
-
-    Is_A_Boy      = Gender == MALE ! Char(Int(z'041C', CH_))
-    Boys_Amount   = Count(Is_A_Boy)
-
-    Boys_Surnames = Pack(Surnames, Is_A_Boy)
-    Boys_Initials = Pack(Initials, Is_A_Boy)
-    Boys_Years    = Pack(Years, Is_A_Boy)
+    ! Read data
+    call Read_class_list(input_file, Surnames, Initials, Genders, Years)
     
-    Boys_Age = CYEAR - Boys_Years
-    Boys_Avg = Ceiling(Real(Sum(Boys_Age) / Boys_Amount, R_))
+    ! Write data
+    call Write_class_list(output_file, Surnames, Initials, Genders, Years, "Исходный список", "rewind")
 
-    open (file=output_file, encoding=E_, newunit=Out, position='append')
-        write(Out, '(/a)') "Список юношей:"
-        format2 = '(3(a, 1x), i4, 1x,  i0, " лет")'
+contains
 
-        write(Out, format2, iostat=IO) &
-        (Boys_Surnames(i), Boys_Initials(i), "М", Boys_Years(i), Boys_Age(i), i = 1, Boys_Amount)
+    ! Procedre Read
+    subroutine Read_class_list(input_file, Surnames, Initials, Genders, Years)
+        character(*)        input_file
+        character(kind=CH_) Surnames(:, :), Initials(:, :), Genders(:)
+        integer             Years(:)
+        intent(in)          input_file
+        intent(out)         Surnames, Initials, Genders, Years
 
-        select case (Mod(Boys_Avg, 10))
-            case (1)
-                postfix = 'god'
-            case (2:4)
-                postfix = 'goda'
-            case default
-                postfix = 'let'
-        endselect 
-        write(Out, '(/a, i0, 1x, a)') "Средний возраст юношей: ", Boys_Avg, postfix
-   close (Out) 
-end program lab_1
+        integer In, IO, i
+        character(:), allocatable   :: format
+        
+        open (file=input_file, encoding=E_, newunit=In)
+            format = '(' // SURNAMES_LEN // 'a1, 1x, ' // INITIALS_LEN // 'a1, 1x, a, 1x, i4)'
+            read (In, format, iostat=IO) (Surnames(i, :), Initials(i, :), Genders(i), Years(i), i=1,STUD_AMOUNT)
+            call Handle_IO_status(IO, "Read students list")
+        close (In)
+
+    end subroutine Read_class_list
+    
+    ! Procedure Write
+    subroutine Write_class_list(Output_File, Surnames, Initials, Genders, Years, List_name, Position)
+        character(*)        Output_File, List_name, Position
+        character(kind=CH_) Surnames(:, :), Initials(:, :), Genders(:)
+        integer             Years(:)
+        intent(in)          Output_File, List_name, Position, Surnames, Initials, Genders, Years
+
+        integer Out, IO, i
+        character(:), allocatable   :: format
+        
+        open (file=Output_File, encoding=E_, newunit=Out, position=Position)
+            write (Out, '(/a)') List_name
+            format = '(' // SURNAMES_LEN // 'a1, 1x, ' // INITIALS_LEN // 'a1, 1x, a, 1x, i0)'
+            write (Out, format, iostat=IO) &
+                (Surnames(i, :), Initials(i, :), Genders(i), Years(i), i=1, STUD_AMOUNT)
+            call Handle_IO_status(IO, "Write students list: " // List_name)
+        close (Out)
+    end subroutine Write_class_list
+end program lab_1_2
