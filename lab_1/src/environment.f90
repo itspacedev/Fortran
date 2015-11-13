@@ -8,6 +8,8 @@ module environment
    integer, parameter      :: C_ = R_                                ! Разновидность типа для компексных переменных.
    integer, parameter      :: CH_= Selected_Char_Kind("ISO_10646")   ! Разновидность типа для символов.
    character(*), parameter :: E_ = "UTF-8"                           ! Кодировка файлов.
+    
+    public String_plus_int
 
    interface operator (//)
       module procedure Int_plus_string
