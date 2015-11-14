@@ -13,7 +13,7 @@ program lab_1_2
 
     character(kind=CH_), allocatable    :: Boys_Surnames(:, :), Boys_Initials(:, :)
     integer, allocatable                :: Boys_Years(:)
-    integer                             :: Years(STUD_AMOUNT), i
+    integer                             :: Years(STUD_AMOUNT), i, Boys_avg_age, CYEAR = 2015
 
     input_file  = "../data/input.txt"
     output_file = "output.txt"
@@ -27,12 +27,68 @@ program lab_1_2
     ! Get Boys
     call Get_list_by_gender(Surnames, Initials, Genders, Years, &
         Boys_Surnames, Boys_Initials, Boys_Years, MALE)
+
+    ! Get Boys avg Age
+    call Get_avg_age(Boys_Years, Boys_avg_age)
     
     ! Write boys list
     call Write_class_list(output_file, Boys_Surnames, Boys_Initials, [(MALE, i=1, Size(Boys_Years))], &
         Boys_Years, "Список юношей", "append")
+    
+    ! Write boys avg age
+    call Write_avg_age(output_file, "юношей", Boys_avg_age, "append")
 
 contains
+    
+    ! Procedure write avg age
+    subroutine Write_avg_age(output_file, str, avg_age, Position)
+        character(*)    output_file, str, Position
+        integer         avg_age
+
+        intent(in)      output_file, str, avg_age, Position
+    
+        integer Out, IO
+        character(:), allocatable :: format
+
+        open(file=output_file, encoding=E_, newunit=Out, position=Position)
+            format =  '(a, ": ", i0, ," ", a)'
+            !write (Out, format, iostat=IO) "Средний возраст " // str, avg_age, Get_postfix(avg_age)
+            
+            write(Out, '(/a, 1x, a, 1x, i0, 1x, a)') "Средний возраст", str, avg_age, Get_postfix(avg_age)
+            call Handle_IO_status(IO, "Write avg age")
+        close (Out)
+    endsubroutine Write_avg_age
+
+    ! Function get age postfix
+    pure function Get_postfix(Avg_age) result(Age_postfix)
+        integer                      Avg_age
+        character(:), allocatable :: Age_postfix
+
+        intent(in) Avg_age
+
+        select case (Mod(Avg_age, 10))
+            case (1)
+                Age_postfix = 'год'
+            case (2:4)
+                Age_postfix = 'года'
+            case default
+                Age_postfix = 'лет'
+        endselect
+    endfunction Get_postfix
+
+    ! Procedure to get ages
+    subroutine Get_avg_age(Gender_Years, Gender_avg_age)
+        integer         Gender_Years(:), Gender_avg_age
+        
+        intent(in)      Gender_Years
+        intent(inout)   Gender_avg_age
+
+        !integer(Size(Gender_Years)) :: Gender_Age
+        integer :: Gender_Age(Size(Gender_Years))
+
+        Gender_Age      = CYEAR - Gender_Years
+        Gender_avg_age  = Ceiling(Real(Sum(Gender_Age) / Size(Gender_Age), R_))
+    endsubroutine Get_avg_age
 
     ! Procedre Read
     subroutine Read_class_list(input_file, Surnames, Initials, Genders, Years)
