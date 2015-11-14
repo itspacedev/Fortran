@@ -44,17 +44,14 @@ contains
     subroutine Write_avg_age(output_file, str, avg_age, Position)
         character(*)    output_file, str, Position
         integer         avg_age
-
         intent(in)      output_file, str, avg_age, Position
     
         integer Out, IO
         character(:), allocatable :: format
 
         open(file=output_file, encoding=E_, newunit=Out, position=Position)
-            format =  '(a, ": ", i0, ," ", a)'
-            !write (Out, format, iostat=IO) "Средний возраст " // str, avg_age, Get_postfix(avg_age)
-            
-            write(Out, '(/a, 1x, a, 1x, i0, 1x, a)') "Средний возраст", str, avg_age, Get_postfix(avg_age)
+            format =  '(/a, 1x, a, 1x, i0, 1x, a)'
+            write(Out, format, iostat=IO) "Средний возраст", str, avg_age, Get_postfix(avg_age)
             call Handle_IO_status(IO, "Write avg age")
         close (Out)
     endsubroutine Write_avg_age
