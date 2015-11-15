@@ -42,23 +42,23 @@ program lab_1
         end select
     
     ! Write initial list
-    !open (file=output_file, encoding=E_, newunit=Out)
-    !    write (Out, '(a)') "Исходный список:"
-    !    write (Out, format, iostat=IO) (Surnames(i), Initials(i), Gender(i), Years(i), i = 1, STUD_AMOUNT)
-    !close (Out)
+    open (file=output_file, encoding=E_, newunit=Out)
+        write (Out, '(a)') "Исходный список:"
+        write (Out, format, iostat=IO) (Surnames(i), Initials(i), Gender(i), Years(i), i = 1, STUD_AMOUNT)
+    close (Out)
     
     ! Handle write error
-    !Out = OUTPUT_UNIT
-    !open (Out, encoding=E_)
-    !    select case (io)
-    !        case(0)
-    !        case(IOSTAT_END)
-    !            write (Out, *) "End of file has been reached while writing class"
-    !        case(1:)
-    !            write (Out, *) "Error while writing class list: ", io
-    !        case default
-    !            write (Out, *) "Unknown error: ", io
-    !    end select
+    Out = OUTPUT_UNIT
+    open (Out, encoding=E_)
+        select case (io)
+            case(0)
+            case(IOSTAT_END)
+                write (Out, *) "End of file has been reached while writing class"
+            case(1:)
+                write (Out, *) "Error while writing class list: ", io
+            case default
+                write (Out, *) "Unknown error: ", io
+        end select
 
     ! Main Logic
     Is_A_Boy      = Gender == MALE
@@ -72,13 +72,13 @@ program lab_1
     Boys_Avg = Ceiling(Real(Sum(Boys_Age) / Boys_Amount, R_))
 
     ! Write result
-    open (file=output_file, encoding=E_, newunit=Out, position='rewind')
-        !write(Out, '(/a)') "Список юношей:"
-        !!format2 = '(3(a, 1x), i4, 1x,  i0, " лет")'
-        format2 = '(3(a, 1x), i4)'
-        !write(Out, format2, iostat=IO) &
-        !(Boys_Surnames(i), Boys_Initials(i), "М", Boys_Years(i), i = 1, Boys_Amount)
-        !!(Boys_Surnames(i), Boys_Initials(i), "М", Boys_Years(i), Boys_Age(i), i = 1, Boys_Amount)
+    open (file=output_file, encoding=E_, newunit=Out, position='append')
+        write(Out, '(/a)') "Список юношей:"
+        format2 = '(3(a, 1x), i4, 1x,  i0, " лет")'
+
+        write(Out, format2, iostat=IO) &
+        (Boys_Surnames(i), Boys_Initials(i), "М", Boys_Years(i), Boys_Age(i), i = 1, Boys_Amount)
+
         select case (Mod(Boys_Avg, 10))
             case (1)
                 postfix = 'год'

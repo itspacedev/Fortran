@@ -29,8 +29,10 @@ program lab_1_2
         Boys_Surnames, Boys_Initials, Boys_Years, MALE)
 
     ! Get Boys avg Age
-    call Get_avg_age(Boys_Years, Boys_avg_age)
-    
+    !call Get_avg_age(Boys_Years, Boys_avg_age)
+    Boys_avg_age = Get_avg_age(Boys_Years)
+
+
     ! Write boys list
     call Write_class_list(output_file, Boys_Surnames, Boys_Initials, [(MALE, i=1, Size(Boys_Years))], &
         Boys_Years, "Список юношей", "append")
@@ -74,18 +76,19 @@ contains
     endfunction Get_postfix
 
     ! Procedure to get ages
-    subroutine Get_avg_age(Gender_Years, Gender_avg_age)
+    pure function Get_avg_age(Gender_Years) result(Gender_avg_age)
         integer         Gender_Years(:), Gender_avg_age
         
         intent(in)      Gender_Years
-        intent(inout)   Gender_avg_age
+        !intent(out)     Gender_avg_age
 
         !integer(Size(Gender_Years)) :: Gender_Age
         integer :: Gender_Age(Size(Gender_Years))
 
         Gender_Age      = CYEAR - Gender_Years
         Gender_avg_age  = Ceiling(Real(Sum(Gender_Age) / Size(Gender_Age), R_))
-    endsubroutine Get_avg_age
+    !endsubroutine Get_avg_age
+    endfunction Get_avg_age
 
     ! Procedre Read
     subroutine Read_class_list(input_file, Surnames, Initials, Genders, Years)
